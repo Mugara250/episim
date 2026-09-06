@@ -35,7 +35,8 @@ class User(SQLAlchemyBaseUserTableUUID, Base):
 
     __tablename__ = "users"
 
-    full_name: Mapped[str] = mapped_column(String, nullable=False)
+    first_name: Mapped[str] = mapped_column(String, nullable=False)
+    last_name: Mapped[str] = mapped_column(String, nullable=False)
     phone: Mapped[str | None] = mapped_column(String, nullable=True)
     institution_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True), ForeignKey("institutions.id"), nullable=True

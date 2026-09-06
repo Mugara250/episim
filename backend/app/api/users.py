@@ -8,7 +8,7 @@ from app.core.db import get_async_session
 from app.core.users import current_active_user
 from app.models.session import Session as SessionModel
 from app.models.user import User
-from app.schemas.user import SessionRead, UserRead, UserUpdate
+from app.schemas.user import SessionRead, UserPublic, UserRead, UserUpdate
 
 router = APIRouter(prefix="/users", tags=["users"])
 
@@ -56,3 +56,19 @@ async def revoke_my_session(
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Session not found")
     await db.execute(delete(SessionModel).where(SessionModel.id == session_id))
     await db.commit()
+
+
+@router.get("/{user_id}", response_model=UserPublic)
+async def get_user_public(
+    user_id: uuid.UUID,
+    db: AsyncSession = Depends(get_async_session),
+    _: User = Depends(current_active_user),
+):
+    """Public-safe profile lookup, e.g. resolving "created by" attribution
+    on shared resources like disease presets. Must stay registered after the
+    static /me routes above - otherwise "me" would be parsed as a user_id.
+    """
+    user = await db.get(User, user_id)
+    if user is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="User not found")
+    return user

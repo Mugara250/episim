@@ -8,7 +8,8 @@ from app.models.user import UserRole, UserStatus
 
 
 class UserRead(schemas.BaseUser[uuid.UUID]):
-    full_name: str
+    first_name: str
+    last_name: str
     phone: str | None
     institution_id: uuid.UUID | None
     role: UserRole
@@ -19,16 +20,33 @@ class UserRead(schemas.BaseUser[uuid.UUID]):
 
 
 class UserCreate(schemas.BaseUserCreate):
-    full_name: str
+    first_name: str
+    last_name: str
     phone: str | None = None
     institution_id: uuid.UUID | None = None
     role: UserRole = UserRole.analyst
 
 
 class UserUpdate(schemas.BaseUserUpdate):
-    full_name: str | None = None
+    first_name: str | None = None
+    last_name: str | None = None
     phone: str | None = None
     institution_id: uuid.UUID | None = None
+
+
+class UserPublic(BaseModel):
+    """Minimal, non-sensitive profile shown to other users (e.g. "created by"
+    attribution on shared resources) - deliberately excludes email, phone,
+    and verification/status fields that UserRead exposes to the user
+    themselves.
+    """
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    first_name: str
+    last_name: str
+    role: UserRole
 
 
 class SessionRead(BaseModel):

@@ -26,7 +26,7 @@ async def register_and_login(client: AsyncClient, role: str = "analyst", has_adm
     email = f"test-{uuid.uuid4().hex[:10]}@example.com"
     register_resp = await client.post(
         "/auth/register",
-        json={"email": email, "password": DEFAULT_PASSWORD, "full_name": "Test User", "role": role},
+        json={"email": email, "password": DEFAULT_PASSWORD, "first_name": "Test", "last_name": "User", "role": role},
     )
     user_id = register_resp.json()["id"]
 
