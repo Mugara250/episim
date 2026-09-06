@@ -1,0 +1,93 @@
+services:
+  postgres:
+    image: postgis/postgis:16-3.4
+    container_name: episim-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: episim
+      POSTGRES_PASSWORD: episim
+      POSTGRES_DB: episim
+    ports:
+      - "5433:5432"   # host 5433 to avoid clashing with any other local postgres on 5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U episim -d episim"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:alpine
+    container_name: episim-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  minio:
+    image: minio/minio:latest
+    container_name: episim-minio
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: episim_minio
+      MINIO_ROOT_PASSWORD: episim_minio_secret
+    ports:
+      - "9000:9000"   # API
+      - "9001:9001"   # web console
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: episim-mailhog
+    restart: unless-stopped
+    ports:
+      - "8025:8025"   # web UI
+      - "1025:1025"   # SMTP
+
+  backend:
+    build: .
+    container_name: episim-backend
+    restart: unless-stopped
+    working_dir: /app
+    volumes:
+      - ./:/app
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    command: bash -c "alembic upgrade head && uvicorn app.main:app --reload --host 0.0.0.0 --port 8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  celery_worker:
+    build: .
+    container_name: episim-celery-worker
+    restart: unless-stopped
+    working_dir: /app
+    volumes:
+      - ./:/app
+    env_file:
+      - .env
+    command: celery -A app.workers worker --loglevel=info
+    depends_on:
+      redis:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+  minio_data:

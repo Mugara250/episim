@@ -1,0 +1,40 @@
+# --- Web framework ---
+fastapi>=0.115
+uvicorn[standard]>=0.32
+pydantic>=2.9
+pydantic-settings>=2.6
+
+# --- Auth (RBAC, JWT, password reset) ---
+fastapi-users[sqlalchemy]>=14.0
+passlib[bcrypt]>=1.7
+
+# --- Database / ORM / migrations ---
+sqlalchemy>=2.0
+alembic>=1.13
+asyncpg>=0.30            # async Postgres driver (used by SQLAlchemy's async engine)
+geoalchemy2>=0.15        # PostGIS types/queries through SQLAlchemy
+
+# --- Background jobs (simulation execution) ---
+celery>=5.4
+redis>=5.1
+
+# --- Object storage (S3-compatible; works against MinIO locally) ---
+boto3>=1.35
+
+# --- Simulation / numerical stack ---
+numpy>=2.1
+scipy>=1.14              # SEIR differential equations (solve_ivp)
+pandas>=2.2               # data wrangling, Monte Carlo aggregation
+mesa>=3.0                 # agent-based modeling (Module 7)
+
+# --- File handling ---
+python-multipart>=0.0.12  # form/file uploads (population dataset import)
+email-validator>=2.2      # required by Pydantic's EmailStr
+
+# --- Config / environment ---
+python-dotenv>=1.0
+
+# --- Testing ---
+pytest>=8.3
+pytest-asyncio>=0.24
+httpx>=0.27               # also used as the test client for FastAPI

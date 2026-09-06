@@ -1,0 +1,21 @@
+# --- Backend (Python) ---
+backend/.venv/
+backend/.env
+backend/.env.venv-local
+backend/__pycache__/
+backend/**/__pycache__/
+backend/*.egg-info/
+backend/.pytest_cache/
+backend/.env.venv-local
+
+# --- Frontend (Node / Next.js) ---
+# lib/api-types.ts is intentionally NOT ignored - it's committed so a fresh
+# clone type-checks without needing the backend running first; regenerate it
+# with `npm run generate-api` whenever the backend schema changes.
+frontend/node_modules/
+frontend/.next/
+frontend/.env
+
+# --- Editors / OS ---
+.vscode/
+.DS_Store
