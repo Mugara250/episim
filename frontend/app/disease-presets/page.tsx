@@ -106,15 +106,25 @@ export default function DiseasePresetsPage() {
               <p className="mt-3 text-xs text-text-secondary">Created by: {createdByLabel(preset)}</p>
               {source && <p className="text-xs text-text-secondary">Cloned from: {source.name}</p>}
 
-              {preset.permissions.can_clone && (
-                <button
-                  type="button"
-                  onClick={() => setCloning(preset)}
-                  className="mt-4 w-full rounded-full border border-border-strong px-3 py-1.5 text-xs font-semibold text-text-primary transition hover:border-brand/50"
-                >
-                  Clone as Custom
-                </button>
-              )}
+              <div className="mt-4 flex gap-2">
+                {preset.permissions.can_edit && (
+                  <Link
+                    href={`/disease-presets/${preset.id}/edit`}
+                    className="flex-1 rounded-full bg-brand/15 px-3 py-1.5 text-center text-xs font-semibold text-brand-light transition hover:bg-brand/25"
+                  >
+                    Edit
+                  </Link>
+                )}
+                {preset.permissions.can_clone && (
+                  <button
+                    type="button"
+                    onClick={() => setCloning(preset)}
+                    className="flex-1 rounded-full border border-border-strong px-3 py-1.5 text-xs font-semibold text-text-primary transition hover:border-brand/50"
+                  >
+                    Clone as Custom
+                  </button>
+                )}
+              </div>
             </div>
           );
         })}
