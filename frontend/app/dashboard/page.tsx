@@ -5,14 +5,7 @@ import { useRouter } from "next/navigation";
 import { DashboardShell } from "@/components/DashboardShell";
 import { getMe, type User } from "@/lib/api";
 import { getToken } from "@/lib/auth";
-
-const ROLE_LABELS: Record<string, string> = {
-  analyst: "Analyst",
-  epidemiologist: "Epidemiologist",
-  health_officer: "Health Officer",
-  policy_maker: "Policy Maker",
-  admin: "Administrator",
-};
+import { roleLabel } from "@/lib/roles";
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -41,7 +34,7 @@ export default function DashboardPage() {
           <p className="mt-1 text-xl font-bold text-text-primary">{user.full_name}</p>
           <span className="mt-3 inline-flex items-center gap-2 rounded-full border border-border bg-surface-2 px-3 py-1 text-xs font-medium text-brand-light">
             <span className="h-1.5 w-1.5 rounded-full bg-brand" />
-            {ROLE_LABELS[user.role] ?? user.role}
+            {roleLabel(user.role)}
           </span>
         </div>
       )}

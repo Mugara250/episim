@@ -200,6 +200,28 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/users/{user_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get User Public
+         * @description Public-safe profile lookup, e.g. resolving "created by" attribution
+         *     on shared resources like disease presets. Must stay registered after the
+         *     static /me routes above - otherwise "me" would be parsed as a user_id.
+         */
+        get: operations["get_user_public_users__user_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/institutions": {
         parameters: {
             query?: never;
@@ -531,6 +553,23 @@ export interface components {
             /** Institution Id */
             institution_id?: string | null;
             /** @default analyst */
+            role: components["schemas"]["UserRole"];
+        };
+        /**
+         * UserPublic
+         * @description Minimal, non-sensitive profile shown to other users (e.g. "created by"
+         *     attribution on shared resources) - deliberately excludes email, phone,
+         *     and verification/status fields that UserRead exposes to the user
+         *     themselves.
+         */
+        UserPublic: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Full Name */
+            full_name: string;
             role: components["schemas"]["UserRole"];
         };
         /** UserRead */
@@ -962,6 +1001,37 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_user_public_users__user_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UserPublic"];
+                };
             };
             /** @description Validation Error */
             422: {

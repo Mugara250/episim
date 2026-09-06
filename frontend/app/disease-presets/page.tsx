@@ -6,14 +6,16 @@ import { useRouter } from "next/navigation";
 import { DashboardShell } from "@/components/DashboardShell";
 import { PresetBadge } from "@/components/disease-presets/PresetBadge";
 import { CloneModal } from "@/components/disease-presets/CloneModal";
-import { getDiseasePresets, getMe, type DiseasePreset, type User } from "@/lib/api";
+import { getDiseasePresets, getMe, getUserPublic, type DiseasePreset, type User, type UserPublic } from "@/lib/api";
 import { getToken } from "@/lib/auth";
 import { canCreatePresets } from "@/lib/permissions";
+import { roleLabel } from "@/lib/roles";
 
 export default function DiseasePresetsPage() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [presets, setPresets] = useState<DiseasePreset[]>([]);
+  const [creators, setCreators] = useState<Record<string, UserPublic>>({});
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [cloning, setCloning] = useState<DiseasePreset | null>(null);
@@ -24,9 +26,23 @@ export default function DiseasePresetsPage() {
       return;
     }
     Promise.all([getMe(), getDiseasePresets()])
-      .then(([me, list]) => {
+      .then(async ([me, list]) => {
         setUser(me);
         setPresets(list);
+
+        const otherCreatorIds = Array.from(
+          new Set(
+            list
+              .map((p) => p.created_by)
+              .filter((id): id is string => Boolean(id) && id !== me.id)
+          )
+        );
+        const lookups = await Promise.allSettled(otherCreatorIds.map((id) => getUserPublic(id)));
+        const found: Record<string, UserPublic> = {};
+        lookups.forEach((result, i) => {
+          if (result.status === "fulfilled") found[otherCreatorIds[i]] = result.value;
+        });
+        setCreators(found);
       })
       .catch(() => setError("Could not load disease presets."))
       .finally(() => setLoading(false));
@@ -34,6 +50,13 @@ export default function DiseasePresetsPage() {
 
   function presetById(id: string) {
     return presets.find((p) => p.id === id);
+  }
+
+  function createdByLabel(preset: DiseasePreset): string {
+    if (preset.is_builtin) return "System";
+    if (preset.permissions.is_owner) return "You";
+    const creator = preset.created_by ? creators[preset.created_by] : undefined;
+    return creator ? `${creator.full_name} (${roleLabel(creator.role)})` : "Another user";
   }
 
   return (
@@ -80,9 +103,7 @@ export default function DiseasePresetsPage() {
                 </div>
               </dl>
 
-              <p className="mt-3 text-xs text-text-secondary">
-                Created by: {preset.is_builtin ? "System" : preset.permissions.is_owner ? "You" : "Another user"}
-              </p>
+              <p className="mt-3 text-xs text-text-secondary">Created by: {createdByLabel(preset)}</p>
               {source && <p className="text-xs text-text-secondary">Cloned from: {source.name}</p>}
 
               {preset.permissions.can_clone && (

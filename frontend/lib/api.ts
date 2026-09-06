@@ -4,6 +4,7 @@ import type { components } from "@/lib/api-types";
 type Schemas = components["schemas"];
 
 export type User = Schemas["UserRead"];
+export type UserPublic = Schemas["UserPublic"];
 export type Institution = Schemas["InstitutionRead"];
 export type DiseasePreset = Schemas["DiseasePresetRead"];
 export type DiseasePresetInput = Schemas["DiseasePresetCreate"];
@@ -58,6 +59,10 @@ export async function resetPassword(token: string, password: string): Promise<{ 
 
 export async function getMe(): Promise<User> {
   return apiFetch("/users/me");
+}
+
+export async function getUserPublic(id: string): Promise<UserPublic> {
+  return apiFetch(`/users/${id}`);
 }
 
 export async function getInstitutions(): Promise<Institution[]> {
