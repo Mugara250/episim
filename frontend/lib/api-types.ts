@@ -264,6 +264,24 @@ export interface paths {
         /** Update Disease Preset */
         put: operations["update_disease_preset_disease_presets__preset_id__put"];
         post?: never;
+        /** Delete Disease Preset */
+        delete: operations["delete_disease_preset_disease_presets__preset_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/disease-presets/{preset_id}/clone": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Clone Disease Preset */
+        post: operations["clone_disease_preset_disease_presets__preset_id__clone_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -291,6 +309,11 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** DiseasePresetCloneRequest */
+        DiseasePresetCloneRequest: {
+            /** Name */
+            name?: string | null;
+        };
         /** DiseasePresetCreate */
         DiseasePresetCreate: {
             /** Name */
@@ -308,6 +331,17 @@ export interface components {
             transmission_route: components["schemas"]["TransmissionRoute"];
             /** Source Citation */
             source_citation?: string | null;
+        };
+        /** DiseasePresetPermissions */
+        DiseasePresetPermissions: {
+            /** Can Edit */
+            can_edit: boolean;
+            /** Can Clone */
+            can_clone: boolean;
+            /** Can Delete */
+            can_delete: boolean;
+            /** Is Owner */
+            is_owner: boolean;
         };
         /** DiseasePresetRead */
         DiseasePresetRead: {
@@ -335,11 +369,14 @@ export interface components {
             is_builtin: boolean;
             /** Created By */
             created_by: string | null;
+            /** Cloned From Id */
+            cloned_from_id: string | null;
             /**
              * Created At
              * Format: date-time
              */
             created_at: string;
+            permissions: components["schemas"]["DiseasePresetPermissions"];
         };
         /** DiseasePresetUpdate */
         DiseasePresetUpdate: {
@@ -530,6 +567,8 @@ export interface components {
             /** Institution Id */
             institution_id: string | null;
             role: components["schemas"]["UserRole"];
+            /** Has Admin Privileges */
+            has_admin_privileges: boolean;
             status: components["schemas"]["UserStatus"];
             /** Email Verified At */
             email_verified_at: string | null;
@@ -1076,6 +1115,70 @@ export interface operations {
         responses: {
             /** @description Successful Response */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DiseasePresetRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_disease_preset_disease_presets__preset_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                preset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    clone_disease_preset_disease_presets__preset_id__clone_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                preset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DiseasePresetCloneRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
                 headers: {
                     [name: string]: unknown;
                 };

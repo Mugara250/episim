@@ -7,6 +7,8 @@ export type User = Schemas["UserRead"];
 export type Institution = Schemas["InstitutionRead"];
 export type DiseasePreset = Schemas["DiseasePresetRead"];
 export type DiseasePresetInput = Schemas["DiseasePresetCreate"];
+export type DiseasePresetPermissions = Schemas["DiseasePresetPermissions"];
+export type DiseasePresetCloneInput = Schemas["DiseasePresetCloneRequest"];
 export type RegisterInput = Schemas["UserCreate"];
 export type LoginInput = Schemas["LoginRequest"];
 export type ForgotPasswordInput = Schemas["ForgotPasswordRequest"];
@@ -76,4 +78,13 @@ export async function createDiseasePreset(payload: DiseasePresetInput): Promise<
 
 export async function updateDiseasePreset(id: string, payload: DiseasePresetInput): Promise<DiseasePreset> {
   return apiFetch(`/disease-presets/${id}`, { method: "PUT", body: JSON.stringify(payload) });
+}
+
+export async function cloneDiseasePreset(id: string, name?: string): Promise<DiseasePreset> {
+  const payload: DiseasePresetCloneInput = { name: name || null };
+  return apiFetch(`/disease-presets/${id}/clone`, { method: "POST", body: JSON.stringify(payload) });
+}
+
+export async function deleteDiseasePreset(id: string): Promise<void> {
+  return apiFetch(`/disease-presets/${id}`, { method: "DELETE" });
 }

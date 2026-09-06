@@ -50,12 +50,6 @@ export function DiseasePresetForm({
 
   return (
     <form onSubmit={handleSubmit} className="mt-6 max-w-xl space-y-4">
-      {disabled && (
-        <p className="rounded-lg border border-border bg-surface-2 px-3 py-2 text-sm text-text-secondary">
-          Built-in presets cannot be edited.
-        </p>
-      )}
-
       <Field label="Name">
         <input
           required
