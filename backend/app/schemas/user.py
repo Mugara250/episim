@@ -12,6 +12,7 @@ class UserRead(schemas.BaseUser[uuid.UUID]):
     phone: str | None
     institution_id: uuid.UUID | None
     role: UserRole
+    has_admin_privileges: bool
     status: UserStatus
     email_verified_at: datetime | None
     created_at: datetime

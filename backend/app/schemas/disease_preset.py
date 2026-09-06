@@ -25,10 +25,23 @@ class DiseasePresetUpdate(DiseasePresetBase):
     pass
 
 
+class DiseasePresetCloneRequest(BaseModel):
+    name: str | None = None
+
+
+class DiseasePresetPermissions(BaseModel):
+    can_edit: bool
+    can_clone: bool
+    can_delete: bool
+    is_owner: bool
+
+
 class DiseasePresetRead(DiseasePresetBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: uuid.UUID
     is_builtin: bool
     created_by: uuid.UUID | None
+    cloned_from_id: uuid.UUID | None
     created_at: datetime
+    permissions: DiseasePresetPermissions

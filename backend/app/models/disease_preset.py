@@ -32,4 +32,7 @@ class DiseasePreset(Base):
     is_builtin: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     source_citation: Mapped[str | None] = mapped_column(String, nullable=True)
     created_by: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=True)
+    cloned_from_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("disease_presets.id"), nullable=True
+    )
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default="now()")

@@ -3,7 +3,7 @@ import uuid
 from datetime import datetime
 
 from fastapi_users_db_sqlalchemy import SQLAlchemyBaseUserTableUUID
-from sqlalchemy import DateTime, Enum, ForeignKey, String
+from sqlalchemy import Boolean, DateTime, Enum, ForeignKey, String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -41,6 +41,10 @@ class User(SQLAlchemyBaseUserTableUUID, Base):
         UUID(as_uuid=True), ForeignKey("institutions.id"), nullable=True
     )
     role: Mapped[UserRole] = mapped_column(Enum(UserRole, name="user_role"), nullable=False, default=UserRole.analyst)
+    # Grants an epidemiologist the same preset-editing rights as an admin
+    # (see app.services.permissions). Not settable via registration/self-
+    # update - only ever flipped by an operator/future admin tooling.
+    has_admin_privileges: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     email_verified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     status: Mapped[UserStatus] = mapped_column(
         Enum(UserStatus, name="user_status"), nullable=False, default=UserStatus.active
