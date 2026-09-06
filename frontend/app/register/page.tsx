@@ -19,7 +19,8 @@ const ROLES: { value: RegisterInput["role"]; label: string }[] = [
 export default function RegisterPage() {
   const router = useRouter();
   const [institutions, setInstitutions] = useState<Institution[]>([]);
-  const [fullName, setFullName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [institutionId, setInstitutionId] = useState("");
   const [role, setRole] = useState<RegisterInput["role"]>("analyst");
@@ -52,7 +53,8 @@ export default function RegisterPage() {
     setLoading(true);
     try {
       await register({
-        full_name: fullName,
+        first_name: firstName,
+        last_name: lastName,
         email,
         password,
         role,
@@ -92,16 +94,28 @@ export default function RegisterPage() {
         <AuthHeader title="Create your account" subtitle="Join the global epidemic preparedness network" />
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-4">
-          <Field label="Full name">
-            <input
-              required
-              placeholder="Dr. Jane Doe"
-              autoComplete="name"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              className="input"
-            />
-          </Field>
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="First name">
+              <input
+                required
+                placeholder="Jane"
+                autoComplete="given-name"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                className="input"
+              />
+            </Field>
+            <Field label="Last name">
+              <input
+                required
+                placeholder="Doe"
+                autoComplete="family-name"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+                className="input"
+              />
+            </Field>
+          </div>
 
           <Field label="Email address">
             <input

@@ -546,8 +546,10 @@ export interface components {
              * @default false
              */
             is_verified: boolean | null;
-            /** Full Name */
-            full_name: string;
+            /** First Name */
+            first_name: string;
+            /** Last Name */
+            last_name: string;
             /** Phone */
             phone?: string | null;
             /** Institution Id */
@@ -568,8 +570,10 @@ export interface components {
              * Format: uuid
              */
             id: string;
-            /** Full Name */
-            full_name: string;
+            /** First Name */
+            first_name: string;
+            /** Last Name */
+            last_name: string;
             role: components["schemas"]["UserRole"];
         };
         /** UserRead */
@@ -599,8 +603,10 @@ export interface components {
              * @default false
              */
             is_verified: boolean;
-            /** Full Name */
-            full_name: string;
+            /** First Name */
+            first_name: string;
+            /** Last Name */
+            last_name: string;
             /** Phone */
             phone: string | null;
             /** Institution Id */
@@ -639,8 +645,10 @@ export interface components {
             is_superuser?: boolean | null;
             /** Is Verified */
             is_verified?: boolean | null;
-            /** Full Name */
-            full_name?: string | null;
+            /** First Name */
+            first_name?: string | null;
+            /** Last Name */
+            last_name?: string | null;
             /** Phone */
             phone?: string | null;
             /** Institution Id */

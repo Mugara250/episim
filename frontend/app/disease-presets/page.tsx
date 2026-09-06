@@ -8,6 +8,7 @@ import { PresetBadge } from "@/components/disease-presets/PresetBadge";
 import { CloneModal } from "@/components/disease-presets/CloneModal";
 import { getDiseasePresets, getMe, getUserPublic, type DiseasePreset, type User, type UserPublic } from "@/lib/api";
 import { getToken } from "@/lib/auth";
+import { fullName } from "@/lib/name";
 import { canCreatePresets } from "@/lib/permissions";
 import { roleLabel } from "@/lib/roles";
 
@@ -56,7 +57,7 @@ export default function DiseasePresetsPage() {
     if (preset.is_builtin) return "System";
     if (preset.permissions.is_owner) return "You";
     const creator = preset.created_by ? creators[preset.created_by] : undefined;
-    return creator ? `${creator.full_name} (${roleLabel(creator.role)})` : "Another user";
+    return creator ? `${fullName(creator)} (${roleLabel(creator.role)})` : "Another user";
   }
 
   return (
