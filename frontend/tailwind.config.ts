@@ -11,6 +11,10 @@ const config: Config = {
         bg: "#0A0E16",
         surface: "#0F1828",
         "surface-2": "#121A28",
+        // Persistent app shell surfaces (slightly distinct from content panels).
+        sidebar: "#0B111C",
+        topbar: "#0A0E16",
+        "nav-active": "rgba(16, 185, 129, 0.12)",
         border: "#1E293B",
         "border-strong": "#2A3647",
         "text-primary": "#F1F5F9",

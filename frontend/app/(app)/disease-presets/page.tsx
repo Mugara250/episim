@@ -2,19 +2,16 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { DashboardShell } from "@/components/DashboardShell";
 import { PresetBadge } from "@/components/disease-presets/PresetBadge";
 import { CloneModal } from "@/components/disease-presets/CloneModal";
-import { getDiseasePresets, getMe, getUserPublic, type DiseasePreset, type User, type UserPublic } from "@/lib/api";
-import { getToken } from "@/lib/auth";
+import { PageMeta, useAppShell } from "@/components/layout/app-shell-context";
+import { getDiseasePresets, getUserPublic, type DiseasePreset, type UserPublic } from "@/lib/api";
 import { fullName } from "@/lib/name";
 import { canCreatePresets } from "@/lib/permissions";
 import { roleLabel } from "@/lib/roles";
 
 export default function DiseasePresetsPage() {
-  const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
+  const { user } = useAppShell();
   const [presets, setPresets] = useState<DiseasePreset[]>([]);
   const [creators, setCreators] = useState<Record<string, UserPublic>>({});
   const [error, setError] = useState<string | null>(null);
@@ -22,13 +19,9 @@ export default function DiseasePresetsPage() {
   const [cloning, setCloning] = useState<DiseasePreset | null>(null);
 
   useEffect(() => {
-    if (!getToken()) {
-      router.push("/login");
-      return;
-    }
-    Promise.all([getMe(), getDiseasePresets()])
-      .then(async ([me, list]) => {
-        setUser(me);
+    const me = user;
+    getDiseasePresets()
+      .then(async (list) => {
         setPresets(list);
 
         const otherCreatorIds = Array.from(
@@ -47,7 +40,7 @@ export default function DiseasePresetsPage() {
       })
       .catch(() => setError("Could not load disease presets."))
       .finally(() => setLoading(false));
-  }, [router]);
+  }, [user]);
 
   function presetById(id: string) {
     return presets.find((p) => p.id === id);
@@ -61,10 +54,11 @@ export default function DiseasePresetsPage() {
   }
 
   return (
-    <DashboardShell>
+    <>
+      <PageMeta title="Disease Preset Library" subtitle="Configuration Data · Disease parameters" />
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-text-primary">Disease Preset Library</h1>
-        {user && canCreatePresets(user) && (
+        {canCreatePresets(user) && (
           <Link
             href="/disease-presets/new"
             className="rounded-full bg-brand px-4 py-2 text-sm font-semibold text-bg transition hover:bg-brand-light"
@@ -132,6 +126,6 @@ export default function DiseasePresetsPage() {
       </div>
 
       {cloning && <CloneModal preset={cloning} onClose={() => setCloning(null)} />}
-    </DashboardShell>
+    </>
   );
 }

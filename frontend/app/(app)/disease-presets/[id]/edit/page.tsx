@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { DashboardShell } from "@/components/DashboardShell";
 import { DiseasePresetForm } from "@/components/DiseasePresetForm";
+import { PageMeta } from "@/components/layout/app-shell-context";
 import { PresetBadge } from "@/components/disease-presets/PresetBadge";
 import { CloneModal } from "@/components/disease-presets/CloneModal";
 import { deleteDiseasePreset, getDiseasePreset, updateDiseasePreset, type DiseasePreset } from "@/lib/api";
@@ -75,7 +75,8 @@ export default function EditDiseasePresetPage() {
   }
 
   return (
-    <DashboardShell>
+    <>
+      <PageMeta title={preset ? preset.name : "Disease Preset"} subtitle="Edit disease preset" />
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-text-primary">{preset ? preset.name : "Disease Preset"}</h1>
         {preset && <PresetBadge isBuiltin={preset.is_builtin} />}
@@ -135,6 +136,6 @@ export default function EditDiseasePresetPage() {
       )}
 
       {preset && cloning && <CloneModal preset={preset} onClose={() => setCloning(false)} />}
-    </DashboardShell>
+    </>
   );
 }
