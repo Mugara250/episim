@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Icon } from "@/components/layout/icons";
 import { NotificationBell } from "@/components/layout/NotificationBell";
 import { UserMenu } from "@/components/layout/UserMenu";
@@ -27,13 +28,13 @@ export function TopBar() {
 
         <div className="flex shrink-0 items-center gap-2 sm:gap-3">
           <NotificationBell />
-          <button
-            type="button"
+          <Link
+            href="/settings"
             aria-label="Settings"
             className="flex h-9 w-9 items-center justify-center rounded-lg text-text-secondary transition hover:bg-surface-2 hover:text-text-primary"
           >
             <Icon name="settings" />
-          </button>
+          </Link>
 
           <span className="hidden items-center gap-2 rounded-full border border-border bg-surface px-3 py-1.5 text-xs font-medium text-text-secondary md:flex">
             <span className={`h-1.5 w-1.5 rounded-full ${TONE_DOT[status.tone]}`} />

@@ -1,4 +1,4 @@
-import type { SVGProps } from "react";
+import type { ReactElement, SVGProps } from "react";
 
 // Minimal stroke-icon set for the app shell. Keeping them inline (rather than
 // pulling in an icon library) matches the existing hand-rolled SVGs elsewhere
@@ -16,7 +16,7 @@ export type IconName =
   | "chevron-down"
   | "user";
 
-const PATHS: Record<IconName, JSX.Element> = {
+const PATHS: Record<IconName, ReactElement> = {
   dashboard: (
     <>
       <rect x="3" y="3" width="7" height="9" rx="1" />

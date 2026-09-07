@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { AppShell } from "@/components/layout/AppShell";
 import { getMe, type User } from "@/lib/api";
@@ -9,7 +9,7 @@ import { clearSession, getToken } from "@/lib/auth";
 // Shared layout for every authenticated route. Route groups don't affect the
 // URL, so pages here keep their paths (/dashboard, /disease-presets, ...) while
 // all inheriting the sidebar + top bar without re-implementing them.
-export default function AppLayout({ children }: { children: React.ReactNode }) {
+export default function AppLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [redirecting, setRedirecting] = useState(false);

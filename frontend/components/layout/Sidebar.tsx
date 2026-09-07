@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Icon } from "@/components/layout/icons";
@@ -28,7 +28,7 @@ const LEAF_BASE =
 const ITEM_INACTIVE = "text-text-secondary hover:bg-surface-2 hover:text-text-primary";
 const ITEM_ACTIVE = "bg-nav-active text-brand-light";
 
-function NavLink({ href, label, icon }: { href: string; label: string; icon?: React.ReactNode }) {
+function NavLink({ href, label, icon }: { href: string; label: string; icon?: ReactNode }) {
   const pathname = usePathname();
   const active = isRouteActive(pathname, href);
   return (
