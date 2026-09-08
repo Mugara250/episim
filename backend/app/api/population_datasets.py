@@ -20,6 +20,7 @@ from app.schemas.population import (
     PopulationDatasetList,
     PopulationDatasetRead,
     PopulationDatasetSummary,
+    RegionPopulation,
 )
 from app.workers.tasks import aggregate_population_dataset, import_population_dataset
 
@@ -97,11 +98,32 @@ async def get_population_dataset(
         stats_source = "microdata" if micro_count else "none"
         row_count = micro_count or 0
 
+    distribution: list[RegionPopulation] = []
+    if record_count:
+        by_sub_region = await db.execute(
+            select(
+                PopulationRecord.sub_region_id,
+                func.sum(PopulationRecord.population_count),
+            )
+            .where(PopulationRecord.dataset_id == dataset_id)
+            .group_by(PopulationRecord.sub_region_id)
+        )
+        # Roll sector codes up to district (leading 2 digits) for a legible chart.
+        district_totals: dict[str, int] = {}
+        for sub_region_id, pop in by_sub_region.all():
+            district = str(sub_region_id)[:2]
+            district_totals[district] = district_totals.get(district, 0) + int(pop)
+        distribution = [
+            RegionPopulation(region=district, population=pop)
+            for district, pop in sorted(district_totals.items(), key=lambda kv: kv[1], reverse=True)
+        ]
+
     return PopulationDatasetSummary(
         **PopulationDatasetRead.model_validate(dataset).model_dump(),
         total_population=total_population or 0,
         row_count=row_count,
         stats_source=stats_source,
+        distribution=distribution,
     )
 
 

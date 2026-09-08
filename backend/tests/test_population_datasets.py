@@ -271,3 +271,11 @@ async def test_detail_summary_stats(client, monkeypatch):
     assert detail["stats_source"] == "microdata"
     assert detail["row_count"] == 50
     assert detail["total_population"] == 50
+    assert detail["distribution"] == []
+
+    async with async_session_maker() as session:
+        await run_aggregate(session, dataset_id)
+    aggregated = (await client.get(f"/population-datasets/{dataset_id}")).json()
+    assert aggregated["stats_source"] == "records"
+    assert aggregated["total_population"] == 50
+    assert sum(d["population"] for d in aggregated["distribution"]) == 50

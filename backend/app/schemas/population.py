@@ -35,6 +35,11 @@ class PopulationDatasetRead(BaseModel):
     created_at: datetime
 
 
+class RegionPopulation(BaseModel):
+    region: str
+    population: int
+
+
 class PopulationDatasetSummary(PopulationDatasetRead):
     """Detail view: dataset row plus computed summary stats. Counts come from
     `population_records` when the dataset has been aggregated, otherwise from
@@ -44,6 +49,9 @@ class PopulationDatasetSummary(PopulationDatasetRead):
     total_population: int
     row_count: int
     stats_source: str  # "records" | "microdata" | "none"
+    # District-level rollup from population_records, for the map-preview bar
+    # chart. Empty until the dataset has been aggregated.
+    distribution: list[RegionPopulation]
 
 
 class PopulationDatasetList(BaseModel):
