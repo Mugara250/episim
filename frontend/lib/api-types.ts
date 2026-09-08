@@ -310,6 +310,95 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/population-datasets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Population Datasets */
+        get: operations["list_population_datasets_population_datasets_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/population-datasets/{dataset_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Population Dataset */
+        get: operations["get_population_dataset_population_datasets__dataset_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/population-datasets/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Import Population Dataset Endpoint
+         * @description Create a draft dataset, stash the upload, and hand parsing to a Celery
+         *     task. Returns immediately - the request never blocks on the import.
+         */
+        post: operations["import_population_dataset_endpoint_population_datasets_import_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/population-datasets/{dataset_id}/versions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Dataset Versions */
+        get: operations["list_dataset_versions_population_datasets__dataset_id__versions_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/population-datasets/{dataset_id}/aggregate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Aggregate Dataset */
+        post: operations["aggregate_dataset_population_datasets__dataset_id__aggregate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -331,6 +420,38 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AggregateResponse */
+        AggregateResponse: {
+            /**
+             * Dataset Id
+             * Format: uuid
+             */
+            dataset_id: string;
+            /** Status */
+            status: string;
+            /** Detail */
+            detail: string;
+        };
+        /** Body_import_population_dataset_endpoint_population_datasets_import_post */
+        Body_import_population_dataset_endpoint_population_datasets_import_post: {
+            /** Name */
+            name: string;
+            /** Region Id */
+            region_id: string;
+            /** Year */
+            year: number;
+            /** Source */
+            source: string;
+            /** @default microdata */
+            granularity: components["schemas"]["Granularity"];
+            /** File */
+            file: string;
+        };
+        /**
+         * DatasetStatus
+         * @enum {string}
+         */
+        DatasetStatus: "draft" | "validated" | "archived";
         /** DiseasePresetCloneRequest */
         DiseasePresetCloneRequest: {
             /** Name */
@@ -426,6 +547,16 @@ export interface components {
              */
             email: string;
         };
+        /**
+         * Granularity
+         * @description Which storage tier a dataset populates.
+         *
+         *     `microdata` datasets land in `population_microdata` (row-per-person) and
+         *     can be aggregated down into `population_records`. `aggregate` datasets are
+         *     imported straight into `population_records` and skip the microdata tier.
+         * @enum {string}
+         */
+        Granularity: "microdata" | "aggregate";
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
@@ -489,6 +620,99 @@ export interface components {
         MFAVerifyRequest: {
             /** Code */
             code: string;
+        };
+        /** PopulationDatasetList */
+        PopulationDatasetList: {
+            /** Items */
+            items: components["schemas"]["PopulationDatasetRead"][];
+            /** Total */
+            total: number;
+            /** Page */
+            page: number;
+            /** Page Size */
+            page_size: number;
+        };
+        /** PopulationDatasetRead */
+        PopulationDatasetRead: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Region Id */
+            region_id: string;
+            /** Year */
+            year: number;
+            /** Source */
+            source: string;
+            granularity: components["schemas"]["Granularity"];
+            /** Version */
+            version: number;
+            status: components["schemas"]["DatasetStatus"];
+            /** Import Report */
+            import_report: {
+                [key: string]: unknown;
+            } | null;
+            /** Created By */
+            created_by: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /**
+         * PopulationDatasetSummary
+         * @description Detail view: dataset row plus computed summary stats. Counts come from
+         *     `population_records` when the dataset has been aggregated, otherwise from
+         *     the raw `population_microdata` tier.
+         */
+        PopulationDatasetSummary: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Region Id */
+            region_id: string;
+            /** Year */
+            year: number;
+            /** Source */
+            source: string;
+            granularity: components["schemas"]["Granularity"];
+            /** Version */
+            version: number;
+            status: components["schemas"]["DatasetStatus"];
+            /** Import Report */
+            import_report: {
+                [key: string]: unknown;
+            } | null;
+            /** Created By */
+            created_by: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Total Population */
+            total_population: number;
+            /** Row Count */
+            row_count: number;
+            /** Stats Source */
+            stats_source: string;
+            /** Distribution */
+            distribution: components["schemas"]["RegionPopulation"][];
+        };
+        /** RegionPopulation */
+        RegionPopulation: {
+            /** Region */
+            region: string;
+            /** Population */
+            population: number;
         };
         /** ResetPasswordRequest */
         ResetPasswordRequest: {
@@ -1262,6 +1486,168 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["DiseasePresetRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_population_datasets_population_datasets_get: {
+        parameters: {
+            query?: {
+                region_id?: string | null;
+                year?: number | null;
+                source?: string | null;
+                status?: components["schemas"]["DatasetStatus"] | null;
+                page?: number;
+                page_size?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PopulationDatasetList"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_population_dataset_population_datasets__dataset_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                dataset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PopulationDatasetSummary"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    import_population_dataset_endpoint_population_datasets_import_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_import_population_dataset_endpoint_population_datasets_import_post"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PopulationDatasetRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_dataset_versions_population_datasets__dataset_id__versions_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                dataset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PopulationDatasetRead"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    aggregate_dataset_population_datasets__dataset_id__aggregate_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                dataset_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AggregateResponse"];
                 };
             };
             /** @description Validation Error */

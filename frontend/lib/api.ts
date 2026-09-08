@@ -10,6 +10,11 @@ export type DiseasePreset = Schemas["DiseasePresetRead"];
 export type DiseasePresetInput = Schemas["DiseasePresetCreate"];
 export type DiseasePresetPermissions = Schemas["DiseasePresetPermissions"];
 export type DiseasePresetCloneInput = Schemas["DiseasePresetCloneRequest"];
+export type PopulationDataset = Schemas["PopulationDatasetRead"];
+export type PopulationDatasetSummary = Schemas["PopulationDatasetSummary"];
+export type PopulationDatasetList = Schemas["PopulationDatasetList"];
+export type PopulationGranularity = Schemas["Granularity"];
+export type PopulationDatasetStatus = Schemas["DatasetStatus"];
 export type RegisterInput = Schemas["UserCreate"];
 export type LoginInput = Schemas["LoginRequest"];
 export type ForgotPasswordInput = Schemas["ForgotPasswordRequest"];
@@ -92,4 +97,70 @@ export async function cloneDiseasePreset(id: string, name?: string): Promise<Dis
 
 export async function deleteDiseasePreset(id: string): Promise<void> {
   return apiFetch(`/disease-presets/${id}`, { method: "DELETE" });
+}
+
+// --- Module 3: Population Data Management ---
+
+export type PopulationDatasetFilters = {
+  region_id?: string;
+  year?: number;
+  source?: string;
+  status?: PopulationDatasetStatus;
+  page?: number;
+  page_size?: number;
+};
+
+export async function getPopulationDatasets(filters: PopulationDatasetFilters = {}): Promise<PopulationDatasetList> {
+  const params = new URLSearchParams();
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value !== undefined && value !== "") params.set(key, String(value));
+  });
+  const query = params.toString();
+  return apiFetch(`/population-datasets${query ? `?${query}` : ""}`);
+}
+
+export async function getPopulationDataset(id: string): Promise<PopulationDatasetSummary> {
+  return apiFetch(`/population-datasets/${id}`);
+}
+
+export async function getPopulationDatasetVersions(id: string): Promise<PopulationDataset[]> {
+  return apiFetch(`/population-datasets/${id}/versions`);
+}
+
+export async function aggregatePopulationDataset(id: string): Promise<{ dataset_id: string; status: string; detail: string }> {
+  return apiFetch(`/population-datasets/${id}/aggregate`, { method: "POST" });
+}
+
+export type PopulationImportInput = {
+  name: string;
+  region_id: string;
+  year: number;
+  source: string;
+  granularity: PopulationGranularity;
+  file: File;
+};
+
+export async function importPopulationDataset(input: PopulationImportInput): Promise<PopulationDataset> {
+  const token = getToken();
+  const form = new FormData();
+  form.set("name", input.name);
+  form.set("region_id", input.region_id);
+  form.set("year", String(input.year));
+  form.set("source", input.source);
+  form.set("granularity", input.granularity);
+  form.set("file", input.file);
+
+  // Not apiFetch: multipart uploads must NOT carry a JSON Content-Type - the
+  // browser sets the multipart boundary header itself.
+  const res = await fetch(`${API_URL}/population-datasets/import`, {
+    method: "POST",
+    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+    body: form,
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => null);
+    const detail = body?.detail;
+    throw new Error(typeof detail === "string" ? detail : res.statusText);
+  }
+  return res.json() as Promise<PopulationDataset>;
 }
