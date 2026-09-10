@@ -451,7 +451,7 @@ export interface components {
          * DatasetStatus
          * @enum {string}
          */
-        DatasetStatus: "draft" | "validated" | "archived";
+        DatasetStatus: "draft" | "processing" | "validated" | "failed" | "archived";
         /** DiseasePresetCloneRequest */
         DiseasePresetCloneRequest: {
             /** Name */

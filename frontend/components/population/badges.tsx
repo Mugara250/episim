@@ -2,7 +2,9 @@ import type { PopulationDatasetStatus, PopulationGranularity } from "@/lib/api";
 
 const STATUS_STYLES: Record<PopulationDatasetStatus, string> = {
   draft: "bg-surface-2 text-text-secondary",
+  processing: "bg-warning/15 text-warning animate-pulse",
   validated: "bg-brand/15 text-brand-light",
+  failed: "bg-error/15 text-error",
   archived: "bg-surface-2 text-text-faint",
 };
 

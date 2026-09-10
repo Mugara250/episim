@@ -3,6 +3,7 @@
 import { useCallback, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Field } from "@/components/Field";
+import { ImportProgress, type ImportReport } from "@/components/population/ImportProgress";
 import {
   getPopulationDataset,
   importPopulationDataset,
@@ -77,7 +78,8 @@ export function ImportWizard() {
       try {
         const detail = await getPopulationDataset(id);
         setDataset(detail);
-        if (detail.status === "draft" && !detail.import_report) {
+        // Keep polling while the job is queued (draft, no report yet) or running.
+        if (detail.status === "processing" || (detail.status === "draft" && !detail.import_report)) {
           setTimeout(tick, 2000);
         }
       } catch {
@@ -88,17 +90,15 @@ export function ImportWizard() {
   }
 
   if (step === "processing") {
-    const report = dataset?.import_report as
-      | { imported?: number; rejected?: number; rejection_samples?: string[]; error?: string }
-      | null
-      | undefined;
-    const done = dataset && (dataset.status === "validated" || Boolean(report));
+    const report = dataset?.import_report as ImportReport | null | undefined;
+    const done = dataset && (dataset.status === "validated" || dataset.status === "failed");
 
     return (
       <div className="mt-6 max-w-xl rounded-2xl border border-border bg-surface p-6">
-        {!done && (
+        {!done && dataset?.status === "processing" && <ImportProgress report={report} />}
+        {!done && dataset?.status !== "processing" && (
           <p className="text-sm text-text-secondary">
-            Processing import… parsing and validating rows in the background. This page updates automatically.
+            Queued… the import worker will pick this up shortly. This page updates automatically.
           </p>
         )}
         {done && dataset?.status === "validated" && (
@@ -113,7 +113,7 @@ export function ImportWizard() {
         {done && dataset?.status !== "validated" && (
           <>
             <p className="text-sm font-semibold text-error">Import did not complete.</p>
-            <p className="mt-2 text-sm text-text-secondary">{report?.error ?? "The dataset was left in draft status."}</p>
+            <p className="mt-2 text-sm text-text-secondary">{report?.error ?? "The import job did not complete."}</p>
           </>
         )}
         {report?.rejection_samples && report.rejection_samples.length > 0 && (

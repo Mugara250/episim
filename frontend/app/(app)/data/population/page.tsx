@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { PageMeta } from "@/components/layout/app-shell-context";
 import { GranularityBadge, StatusBadge } from "@/components/population/badges";
@@ -10,7 +10,7 @@ import {
   type PopulationDatasetStatus,
 } from "@/lib/api";
 
-const STATUSES: (PopulationDatasetStatus | "")[] = ["", "draft", "validated", "archived"];
+const STATUSES: (PopulationDatasetStatus | "")[] = ["", "draft", "processing", "validated", "failed", "archived"];
 
 export default function PopulationBrowserPage() {
   const [datasets, setDatasets] = useState<PopulationDataset[]>([]);
@@ -23,22 +23,37 @@ export default function PopulationBrowserPage() {
   const [source, setSource] = useState("");
   const [status, setStatus] = useState<PopulationDatasetStatus | "">("");
 
-  useEffect(() => {
-    setLoading(true);
-    getPopulationDatasets({
-      region_id: region || undefined,
-      year: year ? Number(year) : undefined,
-      source: source || undefined,
-      status: status || undefined,
-    })
-      .then((res) => {
-        setDatasets(res.items);
-        setTotal(res.total);
-        setError(null);
+  const load = useCallback(
+    (opts: { spinner?: boolean } = {}) => {
+      if (opts.spinner) setLoading(true);
+      return getPopulationDatasets({
+        region_id: region || undefined,
+        year: year ? Number(year) : undefined,
+        source: source || undefined,
+        status: status || undefined,
       })
-      .catch(() => setError("Could not load population datasets."))
-      .finally(() => setLoading(false));
-  }, [region, year, source, status]);
+        .then((res) => {
+          setDatasets(res.items);
+          setTotal(res.total);
+          setError(null);
+        })
+        .catch(() => setError("Could not load population datasets."))
+        .finally(() => setLoading(false));
+    },
+    [region, year, source, status],
+  );
+
+  useEffect(() => {
+    void load({ spinner: true });
+  }, [load]);
+
+  // Auto-refresh while any listed dataset is still being imported.
+  const anyProcessing = datasets.some((d) => d.status === "processing");
+  useEffect(() => {
+    if (!anyProcessing) return;
+    const t = setInterval(() => void load(), 4000);
+    return () => clearInterval(t);
+  }, [anyProcessing, load]);
 
   const filtersActive = useMemo(() => region || year || source || status, [region, year, source, status]);
 
@@ -50,7 +65,7 @@ export default function PopulationBrowserPage() {
         <h1 className="text-2xl font-bold text-text-primary">Population Datasets</h1>
         <Link
           href="/data/population/import"
-          className="rounded-full bg-brand px-4 py-2 text-sm font-semibold text-bg transition hover:bg-brand-light"
+          className="rounded-full bg-brand px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-dark hover:text-bg"
         >
           + Import Dataset
         </Link>

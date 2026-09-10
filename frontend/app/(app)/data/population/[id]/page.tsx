@@ -6,6 +6,7 @@ import { useParams } from "next/navigation";
 import { PageMeta } from "@/components/layout/app-shell-context";
 import { BarChart } from "@/components/population/BarChart";
 import { GranularityBadge, StatusBadge } from "@/components/population/badges";
+import { ImportProgress, type ImportReport } from "@/components/population/ImportProgress";
 import {
   aggregatePopulationDataset,
   getPopulationDataset,
@@ -40,6 +41,13 @@ export default function PopulationDatasetDetailPage() {
     void load();
   }, [load]);
 
+  // While an import is still parsing, poll until it settles (validated / failed).
+  useEffect(() => {
+    if (dataset?.status !== "processing") return;
+    const t = setInterval(load, 2000);
+    return () => clearInterval(t);
+  }, [dataset?.status, load]);
+
   async function runAggregate() {
     setAggregating(true);
     setNotice(null);
@@ -56,10 +64,7 @@ export default function PopulationDatasetDetailPage() {
     }
   }
 
-  const report = dataset?.import_report as
-    | { imported?: number; rejected?: number; rejection_samples?: string[]; error?: string }
-    | null
-    | undefined;
+  const report = dataset?.import_report as ImportReport | null | undefined;
 
   return (
     <>
@@ -78,6 +83,19 @@ export default function PopulationDatasetDetailPage() {
             <StatusBadge status={dataset.status} />
             <GranularityBadge granularity={dataset.granularity} />
           </div>
+
+          {dataset.status === "processing" && (
+            <div className="mt-6">
+              <ImportProgress report={report} />
+            </div>
+          )}
+
+          {dataset.status === "failed" && (
+            <div className="mt-6 rounded-xl border border-error/40 bg-error/5 p-4 text-sm">
+              <p className="font-semibold text-error">Import failed</p>
+              <p className="mt-1 text-text-secondary">{report?.error ?? "The import job did not complete."}</p>
+            </div>
+          )}
 
           <div className="mt-6 grid gap-4 sm:grid-cols-3">
             <Stat label="Total population" value={dataset.total_population.toLocaleString()} />
