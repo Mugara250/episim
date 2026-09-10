@@ -145,10 +145,14 @@ async def test_import_microdata_populates_microdata_tier(monkeypatch):
 
     assert report["granularity"] == "microdata"
     assert report["imported"] == 500
+    assert report["phase"] == "done"
+    assert report["rows_processed"] == 500
+    assert report["total_rows"] == 500
 
     async with async_session_maker() as session:
         ds = await session.get(PopulationDataset, dataset_id)
         assert ds.status is DatasetStatus.validated
+        assert ds.import_report["phase"] == "done"
         micro = await session.scalar(
             select(func.count()).select_from(PopulationMicrodata).where(PopulationMicrodata.dataset_id == dataset_id)
         )
@@ -180,6 +184,60 @@ async def test_import_aggregate_skips_microdata_tier(monkeypatch):
         )
     assert micro == 0
     assert total == 285
+
+
+async def test_import_marks_processing_then_validated(monkeypatch):
+    """The dataset row carries status=processing plus running progress while the
+    parse is underway, then flips to validated."""
+    dataset_id = await _make_dataset(Granularity.microdata, region_id="progress")
+
+    seen: list[tuple[str, dict]] = []
+    orig_bulk = run_import.__globals__["_bulk_insert"]
+
+    async def spy_bulk(session, model, ds_id, rows):
+        await orig_bulk(session, model, ds_id, rows)
+        async with async_session_maker() as s:
+            ds = await s.get(PopulationDataset, dataset_id)
+            seen.append((ds.status.value, dict(ds.import_report or {})))
+
+    monkeypatch.setattr("app.services.population_jobs._bulk_insert", spy_bulk)
+    monkeypatch.setattr(
+        "app.services.population_jobs.get_object", lambda key: micro_csv(60_000).encode()
+    )
+    async with async_session_maker() as session:
+        await run_import(session, dataset_id, "k")
+
+    # At least one mid-parse observation saw status=processing with progress set.
+    processing = [r for s, r in seen if s == "processing"]
+    assert processing, seen
+    assert processing[-1]["rows_processed"] > 0
+    assert processing[-1]["total_rows"] == 60_000
+
+    async with async_session_maker() as session:
+        ds = await session.get(PopulationDataset, dataset_id)
+    assert ds.status is DatasetStatus.validated
+
+
+async def test_import_failure_marks_failed_and_leaves_no_rows(monkeypatch):
+    dataset_id = await _make_dataset(Granularity.microdata, region_id="failrun")
+
+    def boom(key):
+        # Headers match neither storage tier -> GranularityDetectionError.
+        return "foo,bar,baz\n1,2,3\n".encode()
+
+    monkeypatch.setattr("app.services.population_jobs.get_object", boom)
+    async with async_session_maker() as session:
+        with pytest.raises(Exception):
+            await run_import(session, dataset_id, "k")
+
+    async with async_session_maker() as session:
+        ds = await session.get(PopulationDataset, dataset_id)
+        micro = await session.scalar(
+            select(func.count()).select_from(PopulationMicrodata).where(PopulationMicrodata.dataset_id == dataset_id)
+        )
+    assert ds.status is DatasetStatus.failed
+    assert "error" in ds.import_report
+    assert micro == 0
 
 
 # --- aggregation job ----------------------------------------------------

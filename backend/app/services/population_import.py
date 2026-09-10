@@ -64,6 +64,13 @@ class ImportReport:
     imported: int = 0
     rejected: int = 0
     rejection_samples: list[str] = field(default_factory=list)
+    # Progress fields, meaningful while the import job is still running. `phase`
+    # is "importing" during parsing and "done" once the job finishes. `total_rows`
+    # is the data-row count estimated from the file up front (may be None if not
+    # known); `rows_processed` counts rows seen so far (imported + rejected).
+    phase: str = "importing"
+    rows_processed: int = 0
+    total_rows: int | None = None
 
     def reject(self, row_number: int, reason: str) -> None:
         self.rejected += 1
@@ -76,6 +83,9 @@ class ImportReport:
             "imported": self.imported,
             "rejected": self.rejected,
             "rejection_samples": self.rejection_samples,
+            "phase": self.phase,
+            "rows_processed": self.rows_processed,
+            "total_rows": self.total_rows,
         }
 
 
@@ -254,6 +264,7 @@ def iter_import_batches(
                 report.reject(row_number, str(exc))
 
         report.imported += len(valid)
+        report.rows_processed = report.imported + report.rejected
         if valid:
             yield Batch(tier=tier, rows=valid)
 

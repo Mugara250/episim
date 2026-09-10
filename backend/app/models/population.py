@@ -23,7 +23,12 @@ class Granularity(str, enum.Enum):
 
 class DatasetStatus(str, enum.Enum):
     draft = "draft"
+    # Set while the import job is parsing the upload; `import_report` carries
+    # running progress (phase / rows_processed / total_rows) during this phase.
+    processing = "processing"
     validated = "validated"
+    # Import job raised; `import_report["error"]` holds the reason.
+    failed = "failed"
     archived = "archived"
 
 
@@ -75,8 +80,10 @@ class PopulationDataset(Base):
         nullable=False,
         default=DatasetStatus.draft,
     )
-    # Populated by the import job: rows imported, rows rejected, and a sample of
-    # rejection reasons. Null until an import job has run.
+    # Populated by the import job: while status=processing it holds running
+    # progress (phase, rows_processed, total_rows); on completion, final counts
+    # of rows imported / rejected and a sample of rejection reasons; on failure,
+    # an `error` key. Null until an import job has started.
     import_report: Mapped[dict | None] = mapped_column(JSONB, nullable=True)
     created_by: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True), ForeignKey("users.id"), nullable=True

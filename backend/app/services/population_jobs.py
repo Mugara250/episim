@@ -24,7 +24,24 @@ from app.services.population_import import ImportReport, iter_import_batches
 
 BATCH_INSERT_SIZE = 5_000
 
+# Persist running progress to the dataset row roughly this often (in rows seen),
+# so a polling client sees the bar move without a commit per insert batch.
+PROGRESS_COMMIT_EVERY = 25_000
+
 _TIER_MODEL = {"microdata": PopulationMicrodata, "records": PopulationRecord}
+
+
+def _estimate_total_rows(data: bytes) -> int | None:
+    """Cheap up-front data-row count: newlines minus the header. The file is
+    already fully in memory, so this is a single C-level scan. Returns None for
+    an empty file or one with no trailing newline ambiguity worth reporting.
+    """
+    newlines = data.count(b"\n")
+    if newlines <= 1:
+        return None
+    # If the file doesn't end in a newline the last row isn't counted; add it.
+    trailing = 0 if data.endswith(b"\n") else 1
+    return newlines - 1 + trailing
 
 
 async def _bulk_insert(session: AsyncSession, model, dataset_id: uuid.UUID, rows: list[dict]) -> None:
@@ -41,9 +58,23 @@ async def run_import(session: AsyncSession, dataset_id: uuid.UUID, object_key: s
     report = ImportReport()
     try:
         data = get_object(object_key)
+        report.total_rows = _estimate_total_rows(data)
+
+        # Mark the dataset in-progress before the (potentially long) parse so a
+        # polling client can distinguish "running" from "queued" or "failed".
+        dataset.status = DatasetStatus.processing
+        dataset.import_report = report.as_dict()
+        await session.commit()
+
+        last_committed = 0
         for batch in iter_import_batches(io.BytesIO(data), dataset.granularity, report=report):
             await _bulk_insert(session, _TIER_MODEL[batch.tier], dataset_id, batch.rows)
+            if report.rows_processed - last_committed >= PROGRESS_COMMIT_EVERY:
+                dataset.import_report = report.as_dict()
+                await session.commit()
+                last_committed = report.rows_processed
 
+        report.phase = "done"
         # Detection from the file's headers wins over what the user selected.
         dataset.granularity = Granularity(report.granularity)
         dataset.status = DatasetStatus.validated
@@ -52,11 +83,20 @@ async def run_import(session: AsyncSession, dataset_id: uuid.UUID, object_key: s
         return report.as_dict()
     except Exception as exc:  # noqa: BLE001 - failure must be recorded, not swallowed
         await session.rollback()
+        # Progress commits above may have persisted partial tier rows; clear them
+        # so a failed import leaves no half-loaded data behind.
+        await session.execute(
+            delete(PopulationMicrodata).where(PopulationMicrodata.dataset_id == dataset_id)
+        )
+        await session.execute(
+            delete(PopulationRecord).where(PopulationRecord.dataset_id == dataset_id)
+        )
+        report.phase = "done"
         dataset = await session.get(PopulationDataset, dataset_id)
         if dataset is not None:
-            dataset.status = DatasetStatus.draft
+            dataset.status = DatasetStatus.failed
             dataset.import_report = {**report.as_dict(), "error": str(exc)}
-            await session.commit()
+        await session.commit()
         raise
 
 
