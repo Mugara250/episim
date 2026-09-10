@@ -212,7 +212,7 @@ export function ImportWizard() {
         </p>
       )}
       {error && <p className="text-sm text-error">{error}</p>}
-      <button type="submit" className="rounded-full bg-brand px-5 py-2.5 text-sm font-semibold text-bg transition hover:bg-brand-light">
+      <button type="submit" className="rounded-full bg-brand px-5 py-2.5 text-sm font-semibold text-white transition hover:text-bg hover:bg-brand-dark">
         Next: confirm format
       </button>
     </form>

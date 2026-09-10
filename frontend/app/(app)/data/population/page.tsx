@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { PageMeta } from "@/components/layout/app-shell-context";
 import { GranularityBadge, StatusBadge } from "@/components/population/badges";
 import {
@@ -13,6 +14,7 @@ import {
 const STATUSES: (PopulationDatasetStatus | "")[] = ["", "draft", "processing", "validated", "failed", "archived"];
 
 export default function PopulationBrowserPage() {
+  const router = useRouter();
   const [datasets, setDatasets] = useState<PopulationDataset[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -108,9 +110,17 @@ export default function PopulationBrowserPage() {
                 </tr>
               )}
               {datasets.map((d) => (
-                <tr key={d.id} className="transition hover:bg-surface/60">
+                <tr
+                  key={d.id}
+                  onClick={() => router.push(`/data/population/${d.id}`)}
+                  className="cursor-pointer transition hover:bg-surface/60"
+                >
                   <td className="px-4 py-3">
-                    <Link href={`/data/population/${d.id}`} className="font-semibold text-text-primary hover:text-brand-light">
+                    <Link
+                      href={`/data/population/${d.id}`}
+                      onClick={(e) => e.stopPropagation()}
+                      className="font-semibold text-text-primary hover:text-brand-light"
+                    >
                       {d.name}
                     </Link>
                   </td>
