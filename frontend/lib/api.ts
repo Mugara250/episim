@@ -15,6 +15,16 @@ export type PopulationDatasetSummary = Schemas["PopulationDatasetSummary"];
 export type PopulationDatasetList = Schemas["PopulationDatasetList"];
 export type PopulationGranularity = Schemas["Granularity"];
 export type PopulationDatasetStatus = Schemas["DatasetStatus"];
+export type InterventionType = Schemas["InterventionTypeRead"];
+export type InterventionTypeInput = Schemas["InterventionTypeCreate"];
+export type InterventionTypePermissions = Schemas["InterventionTypePermissions"];
+export type InterventionTypeCloneInput = Schemas["InterventionTypeCloneRequest"];
+export type InterventionPackage = Schemas["InterventionPackageRead"];
+export type InterventionPackageDetail = Schemas["InterventionPackageDetail"];
+export type InterventionPackageList = Schemas["InterventionPackageList"];
+export type InterventionPackageInput = Schemas["InterventionPackageCreate"];
+export type InterventionItem = Schemas["InterventionItemRead"];
+export type InterventionItemInput = Schemas["InterventionItemCreate"];
 export type RegisterInput = Schemas["UserCreate"];
 export type LoginInput = Schemas["LoginRequest"];
 export type ForgotPasswordInput = Schemas["ForgotPasswordRequest"];
@@ -139,6 +149,64 @@ export type PopulationImportInput = {
   granularity: PopulationGranularity;
   file: File;
 };
+
+// --- Module 8: Intervention Scenarios ---
+
+export async function getInterventionTypes(): Promise<InterventionType[]> {
+  return apiFetch("/intervention-types");
+}
+
+export async function getInterventionType(id: string): Promise<InterventionType> {
+  return apiFetch(`/intervention-types/${id}`);
+}
+
+export async function createInterventionType(payload: InterventionTypeInput): Promise<InterventionType> {
+  return apiFetch("/intervention-types", { method: "POST", body: JSON.stringify(payload) });
+}
+
+export async function updateInterventionType(id: string, payload: InterventionTypeInput): Promise<InterventionType> {
+  return apiFetch(`/intervention-types/${id}`, { method: "PUT", body: JSON.stringify(payload) });
+}
+
+export async function cloneInterventionType(id: string, name?: string): Promise<InterventionType> {
+  const payload: InterventionTypeCloneInput = { name: name || null };
+  return apiFetch(`/intervention-types/${id}/clone`, { method: "POST", body: JSON.stringify(payload) });
+}
+
+export type InterventionPackageFilters = {
+  created_by?: string;
+  page?: number;
+  page_size?: number;
+};
+
+export async function getInterventionPackages(filters: InterventionPackageFilters = {}): Promise<InterventionPackageList> {
+  const params = new URLSearchParams();
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value !== undefined && value !== "") params.set(key, String(value));
+  });
+  const query = params.toString();
+  return apiFetch(`/intervention-packages${query ? `?${query}` : ""}`);
+}
+
+export async function getInterventionPackage(id: string): Promise<InterventionPackageDetail> {
+  return apiFetch(`/intervention-packages/${id}`);
+}
+
+export async function createInterventionPackage(payload: InterventionPackageInput): Promise<InterventionPackage> {
+  return apiFetch("/intervention-packages", { method: "POST", body: JSON.stringify(payload) });
+}
+
+export async function deleteInterventionPackage(id: string): Promise<void> {
+  return apiFetch(`/intervention-packages/${id}`, { method: "DELETE" });
+}
+
+export async function addInterventionItem(packageId: string, payload: InterventionItemInput): Promise<InterventionItem> {
+  return apiFetch(`/intervention-packages/${packageId}/items`, { method: "POST", body: JSON.stringify(payload) });
+}
+
+export async function removeInterventionItem(packageId: string, itemId: string): Promise<void> {
+  return apiFetch(`/intervention-packages/${packageId}/items/${itemId}`, { method: "DELETE" });
+}
 
 export async function importPopulationDataset(input: PopulationImportInput): Promise<PopulationDataset> {
   const token = getToken();

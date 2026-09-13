@@ -399,6 +399,129 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/intervention-types": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Intervention Types */
+        get: operations["list_intervention_types_intervention_types_get"];
+        put?: never;
+        /** Create Intervention Type */
+        post: operations["create_intervention_type_intervention_types_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/intervention-types/{type_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Intervention Type */
+        get: operations["get_intervention_type_intervention_types__type_id__get"];
+        /** Update Intervention Type */
+        put: operations["update_intervention_type_intervention_types__type_id__put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/intervention-types/{type_id}/clone": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Clone Intervention Type */
+        post: operations["clone_intervention_type_intervention_types__type_id__clone_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/intervention-packages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Intervention Packages */
+        get: operations["list_intervention_packages_intervention_packages_get"];
+        put?: never;
+        /** Create Intervention Package */
+        post: operations["create_intervention_package_intervention_packages_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/intervention-packages/{package_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Intervention Package */
+        get: operations["get_intervention_package_intervention_packages__package_id__get"];
+        put?: never;
+        post?: never;
+        /** Delete Intervention Package */
+        delete: operations["delete_intervention_package_intervention_packages__package_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/intervention-packages/{package_id}/items": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add Intervention Item */
+        post: operations["add_intervention_item_intervention_packages__package_id__items_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/intervention-packages/{package_id}/items/{item_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove Intervention Item */
+        delete: operations["remove_intervention_item_intervention_packages__package_id__items__item_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -539,6 +662,11 @@ export interface components {
             /** Source Citation */
             source_citation?: string | null;
         };
+        /**
+         * EffectMechanism
+         * @enum {string}
+         */
+        EffectMechanism: "compartment_shift" | "rate_multiplier";
         /** ForgotPasswordRequest */
         ForgotPasswordRequest: {
             /**
@@ -578,6 +706,195 @@ export interface components {
          * @enum {string}
          */
         InstitutionType: "district_health_office" | "hospital" | "research_institute";
+        /** InterventionItemCreate */
+        InterventionItemCreate: {
+            /**
+             * Type Id
+             * Format: uuid
+             */
+            type_id: string;
+            /** Start Day */
+            start_day: number;
+            /** End Day */
+            end_day?: number | null;
+            /** Coverage */
+            coverage: number;
+            /** Effectiveness Override */
+            effectiveness_override?: number | null;
+        };
+        /** InterventionItemRead */
+        InterventionItemRead: {
+            /**
+             * Type Id
+             * Format: uuid
+             */
+            type_id: string;
+            /** Start Day */
+            start_day: number;
+            /** End Day */
+            end_day?: number | null;
+            /** Coverage */
+            coverage: number;
+            /** Effectiveness Override */
+            effectiveness_override?: number | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Package Id
+             * Format: uuid
+             */
+            package_id: string;
+            /** Type Name */
+            type_name: string;
+            effect_mechanism: components["schemas"]["EffectMechanism"];
+        };
+        /** InterventionPackageCreate */
+        InterventionPackageCreate: {
+            /** Name */
+            name: string;
+            /** Description */
+            description?: string | null;
+        };
+        /** InterventionPackageDetail */
+        InterventionPackageDetail: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Description */
+            description: string | null;
+            /**
+             * Created By
+             * Format: uuid
+             */
+            created_by: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Item Count */
+            item_count: number;
+            permissions: components["schemas"]["InterventionPackagePermissions"];
+            /** Items */
+            items: components["schemas"]["InterventionItemRead"][];
+        };
+        /** InterventionPackageList */
+        InterventionPackageList: {
+            /** Items */
+            items: components["schemas"]["InterventionPackageRead"][];
+            /** Total */
+            total: number;
+            /** Page */
+            page: number;
+            /** Page Size */
+            page_size: number;
+        };
+        /** InterventionPackagePermissions */
+        InterventionPackagePermissions: {
+            /** Can Edit */
+            can_edit: boolean;
+            /** Can Delete */
+            can_delete: boolean;
+            /** Is Owner */
+            is_owner: boolean;
+        };
+        /** InterventionPackageRead */
+        InterventionPackageRead: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Description */
+            description: string | null;
+            /**
+             * Created By
+             * Format: uuid
+             */
+            created_by: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Item Count */
+            item_count: number;
+            permissions: components["schemas"]["InterventionPackagePermissions"];
+        };
+        /** InterventionTypeCloneRequest */
+        InterventionTypeCloneRequest: {
+            /** Name */
+            name?: string | null;
+        };
+        /** InterventionTypeCreate */
+        InterventionTypeCreate: {
+            /** Key */
+            key: string;
+            /** Name */
+            name: string;
+            effect_mechanism: components["schemas"]["EffectMechanism"];
+            /** Default Effect Size */
+            default_effect_size: number;
+            /** Source Citation */
+            source_citation?: string | null;
+        };
+        /** InterventionTypePermissions */
+        InterventionTypePermissions: {
+            /** Can Edit */
+            can_edit: boolean;
+            /** Can Clone */
+            can_clone: boolean;
+            /** Is Owner */
+            is_owner: boolean;
+        };
+        /** InterventionTypeRead */
+        InterventionTypeRead: {
+            /** Key */
+            key: string;
+            /** Name */
+            name: string;
+            effect_mechanism: components["schemas"]["EffectMechanism"];
+            /** Default Effect Size */
+            default_effect_size: number;
+            /** Source Citation */
+            source_citation?: string | null;
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Is Builtin */
+            is_builtin: boolean;
+            /** Created By */
+            created_by: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            permissions: components["schemas"]["InterventionTypePermissions"];
+        };
+        /** InterventionTypeUpdate */
+        InterventionTypeUpdate: {
+            /** Key */
+            key: string;
+            /** Name */
+            name: string;
+            effect_mechanism: components["schemas"]["EffectMechanism"];
+            /** Default Effect Size */
+            default_effect_size: number;
+            /** Source Citation */
+            source_citation?: string | null;
+        };
         /** LoginAttemptRead */
         LoginAttemptRead: {
             /**
@@ -1649,6 +1966,351 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["AggregateResponse"];
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_intervention_types_intervention_types_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InterventionTypeRead"][];
+                };
+            };
+        };
+    };
+    create_intervention_type_intervention_types_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InterventionTypeCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InterventionTypeRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_intervention_type_intervention_types__type_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                type_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InterventionTypeRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_intervention_type_intervention_types__type_id__put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                type_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InterventionTypeUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InterventionTypeRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    clone_intervention_type_intervention_types__type_id__clone_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                type_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InterventionTypeCloneRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InterventionTypeRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_intervention_packages_intervention_packages_get: {
+        parameters: {
+            query?: {
+                created_by?: string | null;
+                page?: number;
+                page_size?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InterventionPackageList"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_intervention_package_intervention_packages_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InterventionPackageCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InterventionPackageRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_intervention_package_intervention_packages__package_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                package_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InterventionPackageDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_intervention_package_intervention_packages__package_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                package_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_intervention_item_intervention_packages__package_id__items_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                package_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InterventionItemCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InterventionItemRead"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    remove_intervention_item_intervention_packages__package_id__items__item_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                package_id: string;
+                item_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {
