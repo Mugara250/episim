@@ -6,6 +6,7 @@ from app.models.login_attempt import LoginAttempt
 from app.models.password_reset import PasswordResetToken
 from app.models.disease_preset import DiseasePreset
 from app.models.population import PopulationDataset, PopulationMicrodata, PopulationRecord
+from app.models.intervention import InterventionItem, InterventionPackage, InterventionType
 
 __all__ = [
     "Institution",
@@ -18,4 +19,7 @@ __all__ = [
     "PopulationDataset",
     "PopulationMicrodata",
     "PopulationRecord",
+    "InterventionType",
+    "InterventionPackage",
+    "InterventionItem",
 ]
