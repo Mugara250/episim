@@ -81,7 +81,7 @@ export default function InterventionTypesPage() {
                 <button
                   type="button"
                   onClick={() => setCloning(type)}
-                  className="flex-1 rounded-full border border-border-strong px-3 py-1.5 text-xs font-semibold text-text-primary transition hover:border-brand/50"
+                  className="flex-1 rounded-full border border-border-strong px-3 py-1.5 text-xs font-semibold text-text-primary transition hover:text-bg hover:bg-brand-light"
                 >
                   Clone as Custom
                 </button>

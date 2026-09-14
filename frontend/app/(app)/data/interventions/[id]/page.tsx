@@ -69,7 +69,7 @@ export default function InterventionPackageBuilderPage() {
         </div>
         <Link
           href="/data/interventions"
-          className="rounded-full border border-border-strong px-4 py-2 text-sm font-semibold text-text-primary transition hover:border-brand/50"
+          className="rounded-full border border-border-strong px-4 py-2 text-sm font-semibold text-text-primary transition hover:text-bg hover:bg-brand-light"
         >
           Back to Library
         </Link>
