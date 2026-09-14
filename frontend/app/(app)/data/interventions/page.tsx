@@ -59,13 +59,13 @@ export default function InterventionPackagesPage() {
         <div className="flex gap-2">
           <Link
             href="/data/interventions/types"
-            className="rounded-full border border-border-strong px-4 py-2 text-sm font-semibold text-text-primary transition hover:border-brand/50"
+            className="rounded-full border border-border-strong px-4 py-2 text-sm font-semibold text-text-primary transition hover:text-bg hover:bg-brand-light"
           >
             Manage Intervention Types
           </Link>
           <Link
             href="/data/interventions/new"
-            className="rounded-full bg-brand px-4 py-2 text-sm font-semibold text-bg transition hover:bg-brand-light"
+            className="rounded-full bg-brand px-4 py-2 text-sm font-semibold text-text-primary transition hover:text-bg hover:bg-brand-light"
           >
             + New Package
           </Link>
