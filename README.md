@@ -42,7 +42,7 @@ own.
 
 Once both are up:
 
-- Frontend: http://localhost:3000
+- Frontend: http://localhost:5173
 - Backend API + docs: http://localhost:8000/docs
 - Mailhog (catches verification/reset emails in dev, nothing is really sent):
   http://localhost:8025
@@ -54,7 +54,7 @@ presets (COVID-19, Cholera, Seasonal Influenza).
 
 ### First run
 
-1. Open http://localhost:3000, click **Get Started**, and register an
+1. Open http://localhost:5173, click **Get Started**, and register an
    account (institution list comes from `GET /institutions`, empty until you
    add one directly in Postgres - institutions aren't seeded by default).
 2. Open Mailhog (http://localhost:8025) to get the verification link.

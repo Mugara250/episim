@@ -4,7 +4,7 @@ import type { Config } from "tailwindcss";
 // (dark navy ground, vivid emerald brand, gradient accent cards).
 const config: Config = {
   darkMode: ["class"],
-  content: ["./app/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}"],
+  content: ["./index.html", "./src/**/*.{ts,tsx}"],
   theme: {
     extend: {
       colors: {
