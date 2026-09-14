@@ -112,7 +112,7 @@ export function InterventionTypeForm({
         <button
           type="submit"
           disabled={loading}
-          className="rounded-full bg-brand px-5 py-2.5 text-sm font-semibold text-white transition hover:text-bg hover:bg-brand-light disabled:opacity-50"
+          className="rounded-full bg-brand px-5 py-2.5 text-sm font-semibold text-bg transition hover:bg-brand-light disabled:opacity-50"
         >
           {loading ? "Saving..." : "Save intervention type"}
         </button>
