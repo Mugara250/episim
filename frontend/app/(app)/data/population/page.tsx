@@ -67,7 +67,7 @@ export default function PopulationBrowserPage() {
         <h1 className="text-2xl font-bold text-text-primary">Population Datasets</h1>
         <Link
           href="/data/population/import"
-          className="rounded-full bg-brand px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-light hover:text-bg"
+          className="rounded-full bg-brand px-4 py-2 text-sm font-semibold text-bg transition hover:text-text-primary hover:bg-bg hover:border hover:border-border-strong"
         >
           + Import Dataset
         </Link>

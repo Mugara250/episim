@@ -65,7 +65,7 @@ export default function InterventionPackagesPage() {
           </Link>
           <Link
             href="/data/interventions/new"
-            className="rounded-full bg-brand px-4 py-2 text-sm font-semibold text-text-primary transition hover:text-bg hover:bg-brand-light"
+            className="rounded-full bg-brand px-4 py-2 text-sm font-semibold text-bg transition hover:bg-brand-light"
           >
             + New Package
           </Link>
