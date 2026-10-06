@@ -6,7 +6,7 @@ from sqlalchemy import update
 
 from app.core.db import async_session_maker
 from app.main import app
-from app.models.user import User
+from app.models.user import User, UserRole
 
 DEFAULT_PASSWORD = "SuperSecret123!"
 
@@ -19,20 +19,26 @@ async def client():
 
 
 async def register_and_login(client: AsyncClient, role: str = "analyst", has_admin_privileges: bool = False) -> AsyncClient:
-    """Registers a fresh user, optionally grants admin privileges directly in
-    the DB (not exposed via the API, by design - see UserCreate), logs in,
+    """Registers a fresh user, optionally grants the admin role or admin
+    privileges directly in the DB (neither is exposed via the API, by design -
+    see UserCreate), logs in,
     and attaches the bearer token to the client for subsequent calls.
     """
     email = f"test-{uuid.uuid4().hex[:10]}@example.com"
     register_resp = await client.post(
         "/auth/register",
-        json={"email": email, "password": DEFAULT_PASSWORD, "first_name": "Test", "last_name": "User", "role": role},
+        json={"email": email, "password": DEFAULT_PASSWORD, "first_name": "Test", "last_name": "User", "role": "analyst" if role == "admin" else role},
     )
     user_id = register_resp.json()["id"]
 
+    promotions = {}
+    if role == "admin":
+        promotions["role"] = UserRole.admin
     if has_admin_privileges:
+        promotions["has_admin_privileges"] = True
+    if promotions:
         async with async_session_maker() as session:
-            await session.execute(update(User).where(User.id == uuid.UUID(user_id)).values(has_admin_privileges=True))
+            await session.execute(update(User).where(User.id == uuid.UUID(user_id)).values(**promotions))
             await session.commit()
 
     login_resp = await client.post("/auth/login", json={"email": email, "password": DEFAULT_PASSWORD})

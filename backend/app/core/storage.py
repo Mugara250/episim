@@ -20,7 +20,7 @@ def _client():
         aws_access_key_id=settings.minio_root_user,
         aws_secret_access_key=settings.minio_root_password,
         config=Config(signature_version="s3v4"),
-        region_name="us-east-1",
+        region_name=settings.minio_region,
     )
 
 

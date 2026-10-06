@@ -170,3 +170,20 @@ uses them yet.
   those specific names, to avoid implying an endorsement that doesn't exist.
   Everything else (layout, copy, color palette, section structure) is
   reproduced from the prototype as closely as possible.
+
+## Deployment
+
+Production runs on a single server with Docker Compose. Caddy serves the built frontend and proxies the API, and it gets HTTPS certificates automatically.
+
+1. Point two DNS A records (for example `app.example.com` and `api.example.com`) at the server, and open ports 80 and 443.
+2. On the server, clone the repo, then `cp deploy/.env.prod.example .env.prod` and fill in every `CHANGE_ME` (`openssl rand -hex 32` makes good secrets). Use a real SMTP provider: users must verify their email before they can log in.
+3. `docker compose -f docker-compose.prod.yml --env-file .env.prod up -d --build`
+4. Check `https://api.example.com/health`, then open `https://app.example.com`.
+
+Notes:
+- With `ENVIRONMENT=production`, the demo account isn't seeded and the demo-credentials toggle is hidden. The API refuses to start if `JWT_SECRET` is still a placeholder.
+- Admins can't sign up as admin. Register normally, then promote the account:
+  `docker compose -f docker-compose.prod.yml exec postgres psql -U episim -d episim -c "UPDATE users SET role='admin' WHERE email='you@example.com';"`
+- Only three placeholder institutions are seeded. Add real ones with an `INSERT INTO institutions (id, name, type) VALUES (gen_random_uuid(), '...', 'hospital');`.
+- Re-deploy with `git pull` and the same `up -d --build` command. Migrations run once in the `migrate` service before the API and worker start.
+- Back up the `postgres_data` and `minio_data` volumes.

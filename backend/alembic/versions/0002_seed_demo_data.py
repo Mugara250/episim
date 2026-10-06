@@ -12,6 +12,8 @@ import sqlalchemy as sa
 from alembic import op
 from sqlalchemy.dialects import postgresql
 
+from app.core.config import settings
+
 revision = "0002_seed_demo_data"
 down_revision = "0001_initial"
 branch_labels = None
@@ -48,6 +50,11 @@ def upgrade() -> None:
         sa.column("type", institution_type),
     )
     op.bulk_insert(institutions_table, DEMO_INSTITUTIONS)
+
+    # The demo login's password is public (shown on the dev login page), so
+    # never create it in production.
+    if settings.is_production:
+        return
 
     users_table = sa.table(
         "users",

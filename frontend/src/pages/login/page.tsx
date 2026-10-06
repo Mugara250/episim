@@ -8,6 +8,8 @@ import { saveSession } from "@/lib/auth";
 
 const DEMO_EMAIL = "demo@episim.dev";
 const DEMO_PASSWORD = "Demo1234!";
+// The demo account is only seeded outside production (see backend migration 0002).
+const SHOW_DEMO = import.meta.env.DEV;
 
 const ROLE_HOME: Record<string, string> = {
   admin: "/dashboard",
@@ -46,25 +48,27 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         <AuthHeader title="Welcome back" subtitle="Sign in to your account" />
 
-        <div className="mt-6 text-center">
-          <button
-            type="button"
-            onClick={() => setShowDemo((v) => !v)}
-            className="text-sm font-medium text-brand-light hover:underline"
-          >
-            Show demo credentials
-          </button>
-          {showDemo && (
-            <div className="mt-3 rounded-lg border border-border bg-surface px-4 py-3 text-left text-xs text-text-secondary">
-              <p>
-                Email: <span className="text-text-primary">{DEMO_EMAIL}</span>
-              </p>
-              <p>
-                Password: <span className="text-text-primary">{DEMO_PASSWORD}</span>
-              </p>
-            </div>
-          )}
-        </div>
+        {SHOW_DEMO && (
+          <div className="mt-6 text-center">
+            <button
+              type="button"
+              onClick={() => setShowDemo((v) => !v)}
+              className="text-sm font-medium text-brand-light hover:underline"
+            >
+              Show demo credentials
+            </button>
+            {showDemo && (
+              <div className="mt-3 rounded-lg border border-border bg-surface px-4 py-3 text-left text-xs text-text-secondary">
+                <p>
+                  Email: <span className="text-text-primary">{DEMO_EMAIL}</span>
+                </p>
+                <p>
+                  Password: <span className="text-text-primary">{DEMO_PASSWORD}</span>
+                </p>
+              </div>
+            )}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <Field label="Email address">
