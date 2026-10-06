@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 
 from fastapi_users import schemas
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, field_validator
 
 from app.models.user import UserRole, UserStatus
 
@@ -25,6 +25,14 @@ class UserCreate(schemas.BaseUserCreate):
     phone: str | None = None
     institution_id: uuid.UUID | None = None
     role: UserRole = UserRole.analyst
+
+    @field_validator("role")
+    @classmethod
+    def _no_self_registered_admins(cls, role: UserRole) -> UserRole:
+        # Admins are promoted directly in the DB, never via public signup.
+        if role == UserRole.admin:
+            raise ValueError("The admin role cannot be self-assigned")
+        return role
 
 
 class UserUpdate(schemas.BaseUserUpdate):

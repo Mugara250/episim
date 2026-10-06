@@ -1,0 +1,11 @@
+{$API_DOMAIN} {
+	reverse_proxy backend:8000
+}
+
+{$APP_DOMAIN} {
+	root * /srv/dist
+	encode gzip
+	# Client-side routing: unknown paths fall back to the SPA entry point.
+	try_files {path} /index.html
+	file_server
+}

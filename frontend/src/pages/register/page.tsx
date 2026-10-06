@@ -10,7 +10,6 @@ const ROLES: { value: RegisterInput["role"]; label: string }[] = [
   { value: "epidemiologist", label: "Epidemiologist" },
   { value: "health_officer", label: "Health Officer" },
   { value: "policy_maker", label: "Policy Maker" },
-  { value: "admin", label: "Admin" },
 ];
 
 export default function RegisterPage() {

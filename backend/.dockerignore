@@ -1,7 +1,10 @@
-.venv
-__pycache__
-**/__pycache__
-*.pyc
-.pytest_cache
 .env
-.env.venv-local
+.env.*
+!.env.example
+.venv
+**/__pycache__
+.pytest_cache
+notebooks
+tests
+__pycache__
+*.pyc
